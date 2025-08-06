@@ -9,7 +9,7 @@
     }
 
     public static void UpdateBedrollWarning(EntityPlayer entityPlayer) {
-      var data = GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(entityPlayer.entityId);
+      PersistentPlayerData data = GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(entityPlayer.entityId);
       if (data is null) {
         return;
       }

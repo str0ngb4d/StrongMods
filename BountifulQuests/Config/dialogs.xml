@@ -4,7 +4,7 @@
   <conditional>
     <if cond="mod_loaded('AGF-V2-HUDPlus-1Main')">
       <remove
-            xpath="//dialogs/dialog[@id='trader']/statement[starts-with(@id,'currentjobs')]/quest_entry[@listindex >= 15]" />
+        xpath="//dialogs/dialog[@id='trader']/statement[starts-with(@id,'currentjobs')]/quest_entry[@listindex >= 15]" />
     </if>
   </conditional>
 </config>

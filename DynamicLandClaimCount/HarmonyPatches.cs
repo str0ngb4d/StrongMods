@@ -8,7 +8,7 @@ namespace DynamicLandClaimCount {
   public class BlockLandClaimHandleDeactivatingCurrentLandClaimsPatch {
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions,
       ILGenerator generator) {
-      var codeMatcher = new CodeMatcher(instructions, generator);
+      CodeMatcher codeMatcher = new(instructions, generator);
       codeMatcher
         .MatchStartForward(
           //CodeMatch.LoadsConstant(EnumGameStats.LandClaimCount), // on linux this doesn't match; bug?
@@ -31,7 +31,7 @@ namespace DynamicLandClaimCount {
   public class PersistentPlayerListRemoveExtraLandClaimsPatch {
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions,
       ILGenerator generator) {
-      var codeMatcher = new CodeMatcher(instructions, generator);
+      CodeMatcher codeMatcher = new(instructions, generator);
       codeMatcher
         .MatchStartForward(
           //CodeMatch.LoadsConstant(EnumGameStats.LandClaimCount), // on linux this doesn't match; bug?
@@ -52,28 +52,22 @@ namespace DynamicLandClaimCount {
 
   [HarmonyPatch(typeof(WorldEnvironment), nameof(WorldEnvironment.OnXMLChanged))]
   public class WorldEnvironmentOnXMLChangedPatch {
-    private static void Postfix() {
-      DynamicLandClaimCount.OnXMLChanged();
-    }
+    private static void Postfix() => DynamicLandClaimCount.OnXMLChanged();
   }
 
   [HarmonyPatch(typeof(PersistentPlayerData), nameof(PersistentPlayerData.AddLandProtectionBlock))]
   public class PersistentPlayerDataAddLandProtectionBlockPatch {
-    private static void Postfix(PersistentPlayerData __instance) {
-      DynamicLandClaimCount.WhisperLandClaimCount(__instance);
-    }
+    private static void Postfix(PersistentPlayerData __instance) => DynamicLandClaimCount.WhisperLandClaimCount(__instance);
   }
 
   [HarmonyPatch(typeof(PersistentPlayerData), nameof(PersistentPlayerData.RemoveLandProtectionBlock))]
   public class PersistentPlayerDataRemoveLandProtectionBlockPatch {
-    private static void Postfix(PersistentPlayerData __instance) {
-      DynamicLandClaimCount.WhisperLandClaimCount(__instance);
-    }
+    private static void Postfix(PersistentPlayerData __instance) => DynamicLandClaimCount.WhisperLandClaimCount(__instance);
   }
 
   public class Initializer : IModApi {
     public void InitMod(Mod _modInstance) {
-      var harmony = new Harmony(_modInstance.Name);
+      Harmony harmony = new(_modInstance.Name);
       harmony.PatchAll(Assembly.GetExecutingAssembly());
 
       ModEvents.ChatMessage.RegisterHandler(DynamicLandClaimCount.HandleChatMessage);

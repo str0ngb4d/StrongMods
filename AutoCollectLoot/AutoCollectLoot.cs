@@ -17,12 +17,12 @@ namespace AutoCollectLoot {
 
       Log.Out($"[AutoCollectLoot] Collecting loot for {entity.EntityName}");
 
-      var lootDropItemName = GetLootItemName(entity);
+      string lootDropItemName = GetLootItemName(entity);
       if (lootDropItemName is null || lootDropItemName.Length == 0) {
         return false;
       }
 
-      var player = ChooseRecipient(entity);
+      EntityPlayer player = ChooseRecipient(entity);
       if (player is null) {
         return false;
       }
@@ -39,39 +39,39 @@ namespace AutoCollectLoot {
         return true;
       }
 
-      var worldTime = GameManager.Instance.World.worldTime;
-      var duskHour = GameManager.Instance.World.DuskHour;
-      var dawnHour = GameManager.Instance.World.DawnHour;
-      var bloodmoonDay = SkyManager.bloodmoonDay;
+      ulong worldTime = GameManager.Instance.World.worldTime;
+      int duskHour = GameManager.Instance.World.DuskHour;
+      int dawnHour = GameManager.Instance.World.DawnHour;
+      int bloodmoonDay = SkyManager.bloodmoonDay;
       return GameUtils.IsBloodMoonTime(worldTime, (duskHour, dawnHour), bloodmoonDay);
     }
 
     public static string GetLootItemName(EntityAlive entity) {
-      var classes = EntityClass.list;
-      var dropped = classes[classes[entity.entityClass].lootDropEntityClass];
+      DictionarySave<int, EntityClass> classes = EntityClass.list;
+      EntityClass dropped = classes[classes[entity.entityClass].lootDropEntityClass];
       if (dropped is null) {
         Log.Warning($"[AutoCollectLoot] No loot item found for {entity.EntityName}");
         return null;
       }
 
-      var lootItemName = dropped.Properties.GetString(LootItemNameProperty);
+      string lootItemName = dropped.Properties.GetString(LootItemNameProperty);
       Log.Out($"[AutoCollectLoot] Found loot item {lootItemName} for {entity.EntityName}");
       return lootItemName;
     }
 
     public static EntityPlayer ChooseRecipient(EntityAlive entity) {
-      var lottery = new LootLottery(entity);
+      LootLottery lottery = new(entity);
       return lottery.ChooseWinner();
     }
 
     public static bool TryGiveLoot(string itemName, EntityPlayer player) {
-      var itemValue = ItemClass.GetItem(itemName);
+      ItemValue itemValue = ItemClass.GetItem(itemName);
       if (itemValue is null) {
         return false;
       }
 
-      var world = GameManager.Instance.World;
-      var loot = (EntityItem)EntityFactory.CreateEntity(new EntityCreationData {
+      World world = GameManager.Instance.World;
+      EntityItem loot = (EntityItem)EntityFactory.CreateEntity(new EntityCreationData {
         entityClass = EntityClass.FromString("item"),
         id = EntityFactory.nextEntityID++,
         itemStack = new ItemStack(itemValue, 1),
@@ -105,16 +105,16 @@ namespace AutoCollectLoot {
       }
 
       // killer has a 50% chance to win off the bat
-      var killer = _killed.entityThatKilledMe as EntityPlayer;
+      EntityPlayer killer = _killed.entityThatKilledMe as EntityPlayer;
       if (killer is not null && _random.RandomRange(2) == 0) {
         return killer;
       }
 
-      var range = GameStats.GetInt(EnumGameStats.PartySharedKillRange);
-      var candidates = new List<Entity>();
+      int range = GameStats.GetInt(EnumGameStats.PartySharedKillRange);
+      List<Entity> candidates = new();
       if (killer is not null) {
         candidates.Add(killer);
-        var partyInRange = killer.Party?.MemberList?.FindAll(m => (m.position - _killed.position).magnitude <= range);
+        List<EntityPlayer> partyInRange = killer.Party?.MemberList?.FindAll(m => (m.position - _killed.position).magnitude <= range);
         if (partyInRange is not null) {
           candidates.AddRange(partyInRange); // This will add the killer twice, giving them an extra "lottery ticket"
         }

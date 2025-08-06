@@ -6,7 +6,7 @@ namespace AutoCollectLoot.Patches {
   [HarmonyPatch(typeof(EntityAlive), nameof(EntityAlive.dropItemOnDeath))]
   public class EntityAliveDropItemOnDeathPatch {
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-      var codeMatcher = new CodeMatcher(instructions);
+      CodeMatcher codeMatcher = new(instructions);
       codeMatcher.MatchStartForward(
           CodeMatch.LoadsField(typeof(Entity).Field(nameof(Entity.rand))),
           CodeMatch.Calls(typeof(GameRandom).Method(nameof(GameRandom.RandomFloat))),
@@ -14,7 +14,7 @@ namespace AutoCollectLoot.Patches {
         )
         .ThrowIfInvalid("[AutoCollectLoot] Could not find loot roll")
         .Advance(2);
-      var retLabel = codeMatcher.Instruction.operand;
+      object retLabel = codeMatcher.Instruction.operand;
       codeMatcher.Advance(1).Insert(
         CodeInstruction.LoadArgument(0), // this
         CodeInstruction.Call(() => AutoCollectLoot.TryCollect(null)),

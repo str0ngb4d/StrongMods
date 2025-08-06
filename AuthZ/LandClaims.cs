@@ -30,18 +30,18 @@ namespace AuthZ {
 
       Bedrolls.UpdateBedrollWarning(entity);
 
-      var position = entity.position;
-      var nullableClaim = GetLandClaimPosition(new Vector3i(position));
+      Vector3 position = entity.position;
+      Vector3i? nullableClaim = GetLandClaimPosition(new Vector3i(position));
       if (nullableClaim is null) {
         ClearViolations(entity);
         return;
       }
 
-      var claim = (Vector3i)nullableClaim;
+      Vector3i claim = (Vector3i)nullableClaim;
 
       // Access to LCB is authorized if player or allies are online
       // TODO: Add configurable ACL per LCB
-      var authorizedPlayers = GetOwnerAndAllies(claim);
+      List<PersistentPlayerData> authorizedPlayers = GetOwnerAndAllies(claim);
       if (authorizedPlayers.Count == 0) {
         Log.Warning($"[AuthZ] No authorized players found for land claim at {claim}");
       }
@@ -65,28 +65,28 @@ namespace AuthZ {
     }
 
     public static Vector3i? GetLandClaimPosition(Vector3i position) {
-      var world = GameManager.Instance.World;
+      World world = GameManager.Instance.World;
       if (world.IsWithinTraderArea(position)) {
         return null;
       }
 
-      var chunks = new HashSet<Chunk>();
-      var diameterBlocks = GameStats.GetInt(EnumGameStats.LandClaimSize);
-      var radiusBlocks = (diameterBlocks - 1) / 2;
-      var searchChunks = diameterBlocks / 16 + 1;
-      var searchMinX = position.x - radiusBlocks;
-      var searchMinZ = position.z - radiusBlocks;
+      HashSet<Chunk> chunks = new();
+      int diameterBlocks = GameStats.GetInt(EnumGameStats.LandClaimSize);
+      int radiusBlocks = (diameterBlocks - 1) / 2;
+      int searchChunks = diameterBlocks / 16 + 1;
+      int searchMinX = position.x - radiusBlocks;
+      int searchMinZ = position.z - radiusBlocks;
       // TODO: Reason about whether this wide a search is necessary
-      for (var i = -searchChunks; i <= searchChunks; ++i) {
-        var x = searchMinX + i * 16;
-        for (var j = -searchChunks; j <= searchChunks; ++j) {
-          var z = searchMinZ + j * 16;
-          var c = (Chunk)world.GetChunkFromWorldPos(new Vector3i(x, position.y, z));
+      for (int i = -searchChunks; i <= searchChunks; ++i) {
+        int x = searchMinX + i * 16;
+        for (int j = -searchChunks; j <= searchChunks; ++j) {
+          int z = searchMinZ + j * 16;
+          Chunk c = (Chunk)world.GetChunkFromWorldPos(new Vector3i(x, position.y, z));
           if (c == null || !chunks.Add(c)) {
             continue;
           }
 
-          var landClaim = GetLandClaimPosition(position, c, radiusBlocks);
+          Vector3i? landClaim = GetLandClaimPosition(position, c, radiusBlocks);
           if (landClaim != null) {
             return landClaim;
           }
@@ -97,20 +97,20 @@ namespace AuthZ {
     }
 
     public static Vector3i? GetLandClaimPosition(Vector3i position, Chunk chunk, int claimRadiusBlocks) {
-      var blocks = chunk.IndexedBlocks["lpblock"];
+      List<Vector3i> blocks = chunk.IndexedBlocks["lpblock"];
       if (blocks == null) {
         return null;
       }
 
-      var chunkWorldPosition = chunk.GetWorldPos();
-      foreach (var b in blocks) {
+      Vector3i chunkWorldPosition = chunk.GetWorldPos();
+      foreach (Vector3i b in blocks) {
         if (!BlockLandClaim.IsPrimary(chunk.GetBlock(b))) {
           continue;
         }
 
-        var blockWorldPosition = b + chunkWorldPosition;
-        var deltaX = Math.Abs(blockWorldPosition.x - position.x);
-        var deltaZ = Math.Abs(blockWorldPosition.z - position.z);
+        Vector3i blockWorldPosition = b + chunkWorldPosition;
+        int deltaX = Math.Abs(blockWorldPosition.x - position.x);
+        int deltaZ = Math.Abs(blockWorldPosition.z - position.z);
         if (deltaX <= claimRadiusBlocks && deltaZ <= claimRadiusBlocks) {
           return blockWorldPosition;
         }
@@ -121,19 +121,19 @@ namespace AuthZ {
 
     // Returns owner first
     public static List<PersistentPlayerData> GetOwnerAndAllies(Vector3i landClaimPosition) {
-      var authorized = new List<PersistentPlayerData>();
-      var persistentPlayerList = GameManager.Instance.GetPersistentPlayerList();
+      List<PersistentPlayerData> authorized = new();
+      PersistentPlayerList persistentPlayerList = GameManager.Instance.GetPersistentPlayerList();
       if (persistentPlayerList == null) {
         return authorized;
       }
 
-      var owner = persistentPlayerList.GetLandProtectionBlockOwner(landClaimPosition);
+      PersistentPlayerData owner = persistentPlayerList.GetLandProtectionBlockOwner(landClaimPosition);
       if (owner == null) {
         return authorized;
       }
 
       authorized.Add(owner);
-      var acl = owner.ACL;
+      HashSet<PlatformUserIdentifierAbs> acl = owner.ACL;
       if (acl == null) {
         return authorized;
       }
@@ -144,12 +144,12 @@ namespace AuthZ {
     }
 
     public static bool IsAnyPlayerNearby(IEnumerable<PersistentPlayerData> players, Vector3i position) {
-      foreach (var p in players) {
+      foreach (PersistentPlayerData p in players) {
         if (p.EntityId <= 0) { // Min ID is 1; offline players are -1
           continue;
         }
 
-        var distance = (p.Position - position).ToVector3().magnitude;
+        float distance = (p.Position - position).ToVector3().magnitude;
         if (distance <= MinDistanceForEnemyProtection) {
           return true;
         }
@@ -159,7 +159,7 @@ namespace AuthZ {
     }
 
     public static bool IsAnyPlayerInParty(IEnumerable<PersistentPlayerData> players, EntityPlayer targetPlayer) {
-      var party = targetPlayer.Party?.GetMemberIdList(null) ?? new List<int> { targetPlayer.entityId };
+      List<int> party = targetPlayer.Party?.GetMemberIdList(null) ?? new List<int> { targetPlayer.entityId };
       return players.Any(p => party.Contains(p.EntityId));
     }
 
@@ -174,8 +174,8 @@ namespace AuthZ {
 
     public static void HandleViolationForPlayer(EntityPlayer player, Vector3i claim,
       List<PersistentPlayerData> allowedPlayers) {
-      var playerPos = new Vector3i(player.position);
-      var biome = GameManager.Instance.World.GetBiome(playerPos.x, playerPos.z)?.LocalizedName ?? "unknown";
+      Vector3i playerPos = new(player.position);
+      string biome = GameManager.Instance.World.GetBiome(playerPos.x, playerPos.z)?.LocalizedName ?? "unknown";
       string message;
       if (player.GetAdditionalData().ViolatedClaim != claim) {
         player.GetAdditionalData().ViolatedClaim = claim;
@@ -183,9 +183,9 @@ namespace AuthZ {
         player.SetCVar(ViolationRemainingSecondsCVarName, ViolationTimeLimitSeconds);
         player.Buffs.AddBuff(ViolationBuffName, _buffDuration: ViolationTimeLimitSeconds);
 
-        var playerDisplayName = player.PlayerDisplayName;
-        var ownerDisplayName = allowedPlayers[0].PlayerName.DisplayName;
-        var playerDebugLocation = playerPos.ToDebugLocation();
+        string playerDisplayName = player.PlayerDisplayName;
+        string ownerDisplayName = allowedPlayers[0].PlayerName.DisplayName;
+        string playerDebugLocation = playerPos.ToDebugLocation();
         message = $"{playerDisplayName} entered {ownerDisplayName}'s {biome} claim at ({playerDebugLocation})";
         Log.Out($"[AuthZ] {message}");
         GameManager.Instance.ChatMessageServer(null, EChatType.Global, -1, $"[A0]{message}", null, EMessageSender.None);
@@ -193,7 +193,7 @@ namespace AuthZ {
       }
 
       // Wait to take any action until player has been in violation of the same claim for 5+ seconds
-      var elapsed = Time.time - player.GetAdditionalData().ViolationStartTime;
+      float elapsed = Time.time - player.GetAdditionalData().ViolationStartTime;
       if (elapsed < ViolationTimeLimitSeconds) {
         player.SetCVar(ViolationRemainingSecondsCVarName, ViolationTimeLimitSeconds - elapsed);
         return;
@@ -209,18 +209,18 @@ namespace AuthZ {
 
     public static void RemovePlayerFromClaim(EntityPlayer player, Vector3i claim) {
       // Make a direction vector from the LCB to the entity position
-      var direction = player.position - claim;
+      Vector3 direction = player.position - claim;
       // Ignore y (up/down)
       direction.y = 0.0f;
       // Scale to land claim size so that we're sure the player is teleported outside the claim
-      var landClaimSize = GameStats.GetInt(EnumGameStats.LandClaimSize);
+      int landClaimSize = GameStats.GetInt(EnumGameStats.LandClaimSize);
       direction *= 1.3f * landClaimSize / direction.magnitude;
       // Send them that distance and direction from the LCB
-      var targetPosition = claim + direction;
-      var minRange = 0;
-      var maxRange = 15;
+      Vector3 targetPosition = claim + direction;
+      int minRange = 0;
+      int maxRange = 15;
       if (!player.world.GetRandomSpawnPositionMinMaxToPosition(targetPosition, minRange, maxRange, 1, false,
-            out var newPosition,
+            out Vector3 newPosition,
             player.entityId, _retryCount: 20, _checkLandClaim: true, _maxLandClaimType: EnumLandClaimOwner.Ally,
             _useSquareRadius: true) ||
           newPosition == Vector3.zero) { // The zero test doesn't seem necessary, but there's a bug somewhere
@@ -231,7 +231,7 @@ namespace AuthZ {
               false, out newPosition, player.entityId, _retryCount: 20, _checkLandClaim: true,
               _maxLandClaimType: EnumLandClaimOwner.Ally, _useSquareRadius: true) ||
             newPosition == Vector3.zero) { // Same as above
-          var playerData = GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(player.entityId);
+          PersistentPlayerData playerData = GameManager.Instance.persistentPlayers.GetPlayerDataFromEntityID(player.entityId);
           if (playerData.HasBedrollPos) {
             Log.Warning(
               $"[AuthZ] Could not find a valid teleport position; respawning {player.PlayerDisplayName} at bedroll");
@@ -255,15 +255,15 @@ namespace AuthZ {
     }
 
     public static void AuthorizeBlockChanges(NetPackageSetBlock package) {
-      var unauthorized = new List<BlockChangeInfo>();
-      foreach (var change in package.blockChanges) {
+      List<BlockChangeInfo> unauthorized = new();
+      foreach (BlockChangeInfo change in package.blockChanges) {
         if (change.bChangeBlockValue && !change.blockValue.isair &&
             change.blockValue.Block.GetType().IsAssignableFrom(typeof(BlockLandClaim))) {
-          var world = GameManager.Instance.World;
-          var players = GameManager.Instance.GetPersistentPlayerList();
-          var pos = change.pos;
-          var player = players.GetPlayerDataFromEntityID(change.changedByEntityId);
-          var authorized = world.CanPlaceLandProtectionBlockAt(pos, player);
+          World world = GameManager.Instance.World;
+          PersistentPlayerList players = GameManager.Instance.GetPersistentPlayerList();
+          Vector3i pos = change.pos;
+          PersistentPlayerData player = players.GetPlayerDataFromEntityID(change.changedByEntityId);
+          bool authorized = world.CanPlaceLandProtectionBlockAt(pos, player);
           Log.Out(
             $"[AuthZ] AuthorizeBlockChanges {player.PlayerName.DisplayName} attempted to place a LCB; authorized: {authorized}");
           if (!authorized) {
@@ -272,7 +272,7 @@ namespace AuthZ {
         }
       }
 
-      foreach (var change in unauthorized) {
+      foreach (BlockChangeInfo change in unauthorized) {
         package.blockChanges.Remove(change);
       }
     }
@@ -287,8 +287,6 @@ namespace AuthZ {
   public static class EntityAliveExtension {
     private static readonly ConditionalWeakTable<EntityAlive, EntityAliveAdditionalData> Data = new();
 
-    public static EntityAliveAdditionalData GetAdditionalData(this EntityAlive entity) {
-      return Data.GetOrCreateValue(entity);
-    }
+    public static EntityAliveAdditionalData GetAdditionalData(this EntityAlive entity) => Data.GetOrCreateValue(entity);
   }
 }

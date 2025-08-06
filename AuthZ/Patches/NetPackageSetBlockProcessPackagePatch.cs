@@ -7,7 +7,7 @@ namespace AuthZ.Patches {
   public class NetPackageSetBlockProcessPackagePatch {
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions,
       ILGenerator generator) {
-      var codeMatcher = new CodeMatcher(instructions, generator);
+      CodeMatcher codeMatcher = new(instructions, generator);
       /*codeMatcher
         .MatchStartForward(
           new CodeMatch(OpCodes.Ret)

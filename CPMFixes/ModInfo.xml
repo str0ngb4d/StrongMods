@@ -4,7 +4,7 @@
   <Version value="1.0.0" />
   <DisplayName value="CPM Fixes" />
   <Description
-        value="Fixes for critical issues in CPM that won't be addressed now that the project is no longer in active development." />
+    value="Fixes for critical issues in CPM that won't be addressed now that the project is no longer in active development." />
   <Author value="str0ngb4d" />
   <Website value="" />
 </ModInfo>

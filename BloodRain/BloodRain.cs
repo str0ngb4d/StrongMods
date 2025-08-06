@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cronos;
 using JetBrains.Annotations;
 
@@ -29,9 +30,7 @@ namespace BloodRain {
 
     private static DateTime? _endTime;
 
-    public static bool IsBloodRainTime() {
-      return _endTime is not null;
-    }
+    public static bool IsBloodRainTime() => _endTime is not null;
 
     public static float GetRemainingBloodRainSeconds() {
       if (_endTime is null) {
@@ -42,13 +41,13 @@ namespace BloodRain {
     }
 
     public static void Update() {
-      var now = DateTime.Now;
+      DateTime now = DateTime.Now;
       if (_schedule?.NextWarning is not null && now >= _schedule.NextStartTime - _schedule.NextWarning) {
         WarnPlayers();
       }
 
       if (_schedule is not null && now >= _schedule.NextStartTime) {
-        var currentDay = GameUtils.WorldTimeToDays(GameManager.Instance.World.worldTime);
+        int currentDay = GameUtils.WorldTimeToDays(GameManager.Instance.World.worldTime);
         if (currentDay >= _minGameDay) {
           StartBloodRain(_schedule.DurationIrlMinutes);
         }
@@ -70,7 +69,7 @@ namespace BloodRain {
         return;
       }
 
-      var next = GetNextStartTime(_schedule.CronExpression);
+      DateTime? next = GetNextStartTime(_schedule.CronExpression);
       if (next is null) {
         SetSchedule(null);
         return;
@@ -87,7 +86,7 @@ namespace BloodRain {
           EMessageSender.None);
       }
 
-      var newEndTime = DateTime.Now + TimeSpan.FromMinutes(durationIrlMinutes);
+      DateTime newEndTime = DateTime.Now + TimeSpan.FromMinutes(durationIrlMinutes);
       if (_endTime is null || _endTime < newEndTime) {
         _endTime = newEndTime;
         UpdateBloodRainBuff();
@@ -100,13 +99,13 @@ namespace BloodRain {
     }
 
     private static void UpdateBloodRainBuff() {
-      var playerList = GameManager.Instance?.World?.Players?.list;
+      List<EntityPlayer> playerList = GameManager.Instance?.World?.Players?.list;
       if (playerList is null) {
         return;
       }
 
-      var remaining = GetRemainingBloodRainSeconds();
-      foreach (var p in playerList) {
+      float remaining = GetRemainingBloodRainSeconds();
+      foreach (EntityPlayer p in playerList) {
         if (IsBloodRainTime()) {
           p.SetCVar(BloodRainRemainingSecondsCVar, remaining);
           if (!p.Buffs.HasBuff(BloodRainBuff)) {
@@ -136,14 +135,14 @@ namespace BloodRain {
     }
 
     public static void OnXMLChanged() {
-      var properties = WorldEnvironment.Properties;
+      DynamicProperties properties = WorldEnvironment.Properties;
       if (properties is null) {
         LoadSchedule();
         return;
       }
 
-      var schedule = "";
-      var duration = DefaultDurationIrlMinutes;
+      string schedule = "";
+      float duration = DefaultDurationIrlMinutes;
       properties.ParseString("blood_rain_schedule_irl", ref schedule);
       properties.ParseFloat("blood_rain_duration_irl_minutes", ref duration);
       properties.ParseInt("blood_rain_min_game_day", ref _minGameDay);
@@ -165,14 +164,14 @@ namespace BloodRain {
         return;
       }
 
-      var nextStartTime = GetNextStartTime(cronExpression);
+      DateTime? nextStartTime = GetNextStartTime(cronExpression);
       if (nextStartTime is null) {
         // If there's no future time, no point in storing the schedule
         SetSchedule(null);
         return;
       }
 
-      var nextWarning = GetNextWarningTimeSpan((DateTime)nextStartTime);
+      TimeSpan? nextWarning = GetNextWarningTimeSpan((DateTime)nextStartTime);
       SetSchedule(new BloodRainSchedule(cronExpression, durationIrlMinutes, (DateTime)nextStartTime, nextWarning));
     }
 
@@ -184,21 +183,21 @@ namespace BloodRain {
     }
 
     public static DateTime? GetNextStartTime(CronExpression cronExpression) {
-      var nextOffset = cronExpression.GetNextOccurrence(DateTimeOffset.Now, TimeZoneInfo.Local);
-      var next = nextOffset?.DateTime;
+      DateTimeOffset? nextOffset = cronExpression.GetNextOccurrence(DateTimeOffset.Now, TimeZoneInfo.Local);
+      DateTime? next = nextOffset?.DateTime;
       Log.Out($"[BloodRain] Next blood rain is scheduled for {next}");
       return next;
     }
 
     public static TimeSpan? GetNextWarningTimeSpan(DateTime nextStartTime, TimeSpan? lastWarning = null) {
-      var remaining = (nextStartTime - DateTime.Now).TotalMinutes;
+      double remaining = (nextStartTime - DateTime.Now).TotalMinutes;
       if (remaining < 1) {
         // Don't warn at 0 minutes
         return null;
       }
 
-      var max = lastWarning is null ? DefaultWarningIrlMinutes : ((TimeSpan)lastWarning).TotalMinutes - 1;
-      var next = Math.Floor(Math.Min(max, remaining));
+      double max = lastWarning is null ? DefaultWarningIrlMinutes : ((TimeSpan)lastWarning).TotalMinutes - 1;
+      double next = Math.Floor(Math.Min(max, remaining));
       Log.Out($"[BloodRain] Next warning is scheduled for {next} minutes before the blood rain");
       return TimeSpan.FromMinutes(next);
     }

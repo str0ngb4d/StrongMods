@@ -43,21 +43,28 @@
         <label pos="10,-356" depth="2" text="Tips" />
         <grid pos="20,-390" depth="2" rows="0" cell_width="890" cell_height="26" repeat_content="false"
               arrangement="vertical">
-          <label text="- We're playing [00ff00]Project Z[-]; try the pz commands above for more on the mod" font_size="22" />
+          <label text="- We're playing [00ff00]Project Z[-]; try the pz commands above for more on the mod"
+                 font_size="22" />
           <label
-                text="- Blood hordes rain down [ff0000]daily at 4 AM, 1 PM, and 8 PM Eastern[-], regardless game day/time" font_size="22" />
+            text="- Blood hordes rain down [ff0000]daily at 4 AM, 1 PM, and 8 PM Eastern[-], regardless game day/time"
+            font_size="22" />
           <label text="- Land claims are [00ff00]immune from player damage[-]" font_size="22" />
           <label
-                text="- You will be [ff0000]removed from a land claim[-] if you are not partied with the owner or ally" font_size="22" />
+            text="- You will be [ff0000]removed from a land claim[-] if you are not partied with the owner or ally"
+            font_size="22" />
           <label
-                text="- Zombies can only enter your land claim if [00ff00]you or one of your allies are within 200 m[-]" font_size="22" />
+            text="- Zombies can only enter your land claim if [00ff00]you or one of your allies are within 200 m[-]"
+            font_size="22" />
           <label text="- Land claims and bedrolls [00ff00]cannot be placed in quest POIs (T1+)[-]" font_size="22" />
-          <label text="- Boxes labeled [00ff00]sort[-] will auto-sort their contents to other boxes in your claim" font_size="22" />
+          <label text="- Boxes labeled [00ff00]sort[-] will auto-sort their contents to other boxes in your claim"
+                 font_size="22" />
           <label text="- The server restarts at [00ff00]3 AM, noon, and 7 PM Eastern[-] every day" font_size="22" />
           <label
-                text="- Type [00ff00]ggs[-] in the console to see the game settings, e.g. loot abundance and respawn" font_size="22" />
+            text="- Type [00ff00]ggs[-] in the console to see the game settings, e.g. loot abundance and respawn"
+            font_size="22" />
           <label
-                text="- Craft and use [00ff00]foundation blocks[-] to eliminate terrain gaps on your builds" font_size="22" />
+            text="- Craft and use [00ff00]foundation blocks[-] to eliminate terrain gaps on your builds"
+            font_size="22" />
         </grid>
       </panel>
     </window>

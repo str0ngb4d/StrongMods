@@ -42,7 +42,7 @@
     <buff name="buff_blood_rain_strong" icon="server_feral" icon_color="200,0,0">
       <display_value value=".blood_rain_remaining_seconds" />
       <display_value_format value="time" />
-      <update_rate value=".5"/>
+      <update_rate value=".5" />
       <stack_type value="ignore" />
       <effect_group>
         <!-- copy the networked cvar to the one that can be formatted -->
@@ -59,7 +59,7 @@
         <triggered_effect trigger="onSelfBuffRemove"
                           action="RemoveCVar"
                           cvar=".blood_rain_remaining_seconds" />
-        
+
         <triggered_effect trigger="onSelfBuffStart"
                           action="ModifyScreenEffect"
                           intensity=".9"
@@ -78,7 +78,7 @@
                           action="PlaySound"
                           sound="twitch_bloodmoon_today"
                           play_in_head="true" />
-        
+
         <triggered_effect trigger="onSelfBuffUpdate"
                           action="ModifyScreenEffect"
                           intensity=".9"

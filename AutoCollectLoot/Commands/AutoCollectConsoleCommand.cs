@@ -15,17 +15,11 @@ Usage:
 
 ";
 
-    public override string getDescription() {
-      return "AutoCollectLoot administration";
-    }
+    public override string getDescription() => "AutoCollectLoot administration";
 
-    public override string getHelp() {
-      return Usage;
-    }
+    public override string getHelp() => Usage;
 
-    public override string[] getCommands() {
-      return new[] { "autocollect" };
-    }
+    public override string[] getCommands() => new[] { "autocollect" };
 
     public override void Execute(List<string> @params, CommandSenderInfo senderInfo) {
       try {
@@ -35,7 +29,7 @@ Usage:
           return;
         }
 
-        var command = @params[0];
+        string command = @params[0];
         switch (command) {
           case "enable":
             AutoCollectLoot.Enabled = true;

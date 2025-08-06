@@ -12,17 +12,11 @@ Usage:
 
 ";
 
-    public override string getDescription() {
-      return "Blood rain administration";
-    }
+    public override string getDescription() => "Blood rain administration";
 
-    public override string getHelp() {
-      return Usage;
-    }
+    public override string getHelp() => Usage;
 
-    public override string[] getCommands() {
-      return new[] { "bloodrain", "br" };
-    }
+    public override string[] getCommands() => new[] { "bloodrain", "br" };
 
     public override void Execute(List<string> @params, CommandSenderInfo senderInfo) {
       try {
@@ -32,10 +26,10 @@ Usage:
           return;
         }
 
-        var command = @params[0];
+        string command = @params[0];
         switch (command) {
           case "start":
-            var durationIrlMinutes = 15f;
+            float durationIrlMinutes = 15f;
             if (@params.Count > 1) {
               if (!float.TryParse(@params[1], out durationIrlMinutes)) {
                 SdtdConsole.Instance.Output("Unable to parse duration_irl_minutes " + @params[1]);

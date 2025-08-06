@@ -8,12 +8,12 @@ namespace AuthZ.Patches {
     public const int TraderDeadZone = 100;
 
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-      var codeMatcher = new CodeMatcher(instructions);
+      CodeMatcher codeMatcher = new(instructions);
       codeMatcher.MatchStartForward(
           CodeMatch.StoresLocal("claimSize")
         )
         .ThrowIfInvalid("[AuthZ] Could not find claimSize declaration");
-      var claimSize = codeMatcher.Instruction.operand as int? ?? 0;
+      int claimSize = codeMatcher.Instruction.operand as int? ?? 0;
 
       codeMatcher.MatchStartForward(
           // int num3 = deadZone / 2;

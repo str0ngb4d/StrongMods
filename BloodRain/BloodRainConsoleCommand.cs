@@ -26,10 +26,10 @@ Usage:
           return;
         }
 
-        string command = @params[0];
+        var command = @params[0];
         switch (command) {
           case "start":
-            float durationIrlMinutes = 15f;
+            var durationIrlMinutes = 15f;
             if (@params.Count > 1) {
               if (!float.TryParse(@params[1], out durationIrlMinutes)) {
                 SdtdConsole.Instance.Output("Unable to parse duration_irl_minutes " + @params[1]);

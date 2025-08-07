@@ -37,7 +37,7 @@ namespace AuthZ {
         return;
       }
 
-      Vector3i claim = (Vector3i)nullableClaim;
+      var claim = (Vector3i)nullableClaim;
 
       // Access to LCB is authorized if player or allies are online
       // TODO: Add configurable ACL per LCB
@@ -71,17 +71,17 @@ namespace AuthZ {
       }
 
       HashSet<Chunk> chunks = new();
-      int diameterBlocks = GameStats.GetInt(EnumGameStats.LandClaimSize);
-      int radiusBlocks = (diameterBlocks - 1) / 2;
-      int searchChunks = diameterBlocks / 16 + 1;
-      int searchMinX = position.x - radiusBlocks;
-      int searchMinZ = position.z - radiusBlocks;
+      var diameterBlocks = GameStats.GetInt(EnumGameStats.LandClaimSize);
+      var radiusBlocks = (diameterBlocks - 1) / 2;
+      var searchChunks = diameterBlocks / 16 + 1;
+      var searchMinX = position.x - radiusBlocks;
+      var searchMinZ = position.z - radiusBlocks;
       // TODO: Reason about whether this wide a search is necessary
-      for (int i = -searchChunks; i <= searchChunks; ++i) {
-        int x = searchMinX + i * 16;
-        for (int j = -searchChunks; j <= searchChunks; ++j) {
-          int z = searchMinZ + j * 16;
-          Chunk c = (Chunk)world.GetChunkFromWorldPos(new Vector3i(x, position.y, z));
+      for (var i = -searchChunks; i <= searchChunks; ++i) {
+        var x = searchMinX + i * 16;
+        for (var j = -searchChunks; j <= searchChunks; ++j) {
+          var z = searchMinZ + j * 16;
+          var c = (Chunk)world.GetChunkFromWorldPos(new Vector3i(x, position.y, z));
           if (c == null || !chunks.Add(c)) {
             continue;
           }
@@ -109,8 +109,8 @@ namespace AuthZ {
         }
 
         Vector3i blockWorldPosition = b + chunkWorldPosition;
-        int deltaX = Math.Abs(blockWorldPosition.x - position.x);
-        int deltaZ = Math.Abs(blockWorldPosition.z - position.z);
+        var deltaX = Math.Abs(blockWorldPosition.x - position.x);
+        var deltaZ = Math.Abs(blockWorldPosition.z - position.z);
         if (deltaX <= claimRadiusBlocks && deltaZ <= claimRadiusBlocks) {
           return blockWorldPosition;
         }
@@ -149,7 +149,7 @@ namespace AuthZ {
           continue;
         }
 
-        float distance = (p.Position - position).ToVector3().magnitude;
+        var distance = (p.Position - position).ToVector3().magnitude;
         if (distance <= MinDistanceForEnemyProtection) {
           return true;
         }
@@ -175,7 +175,7 @@ namespace AuthZ {
     public static void HandleViolationForPlayer(EntityPlayer player, Vector3i claim,
       List<PersistentPlayerData> allowedPlayers) {
       Vector3i playerPos = new(player.position);
-      string biome = GameManager.Instance.World.GetBiome(playerPos.x, playerPos.z)?.LocalizedName ?? "unknown";
+      var biome = GameManager.Instance.World.GetBiome(playerPos.x, playerPos.z)?.LocalizedName ?? "unknown";
       string message;
       if (player.GetAdditionalData().ViolatedClaim != claim) {
         player.GetAdditionalData().ViolatedClaim = claim;
@@ -183,9 +183,9 @@ namespace AuthZ {
         player.SetCVar(ViolationRemainingSecondsCVarName, ViolationTimeLimitSeconds);
         player.Buffs.AddBuff(ViolationBuffName, _buffDuration: ViolationTimeLimitSeconds);
 
-        string playerDisplayName = player.PlayerDisplayName;
-        string ownerDisplayName = allowedPlayers[0].PlayerName.DisplayName;
-        string playerDebugLocation = playerPos.ToDebugLocation();
+        var playerDisplayName = player.PlayerDisplayName;
+        var ownerDisplayName = allowedPlayers[0].PlayerName.DisplayName;
+        var playerDebugLocation = playerPos.ToDebugLocation();
         message = $"{playerDisplayName} entered {ownerDisplayName}'s {biome} claim at ({playerDebugLocation})";
         Log.Out($"[AuthZ] {message}");
         GameManager.Instance.ChatMessageServer(null, EChatType.Global, -1, $"[A0]{message}", null, EMessageSender.None);
@@ -193,7 +193,7 @@ namespace AuthZ {
       }
 
       // Wait to take any action until player has been in violation of the same claim for 5+ seconds
-      float elapsed = Time.time - player.GetAdditionalData().ViolationStartTime;
+      var elapsed = Time.time - player.GetAdditionalData().ViolationStartTime;
       if (elapsed < ViolationTimeLimitSeconds) {
         player.SetCVar(ViolationRemainingSecondsCVarName, ViolationTimeLimitSeconds - elapsed);
         return;
@@ -213,12 +213,12 @@ namespace AuthZ {
       // Ignore y (up/down)
       direction.y = 0.0f;
       // Scale to land claim size so that we're sure the player is teleported outside the claim
-      int landClaimSize = GameStats.GetInt(EnumGameStats.LandClaimSize);
+      var landClaimSize = GameStats.GetInt(EnumGameStats.LandClaimSize);
       direction *= 1.3f * landClaimSize / direction.magnitude;
       // Send them that distance and direction from the LCB
       Vector3 targetPosition = claim + direction;
-      int minRange = 0;
-      int maxRange = 15;
+      var minRange = 0;
+      var maxRange = 15;
       if (!player.world.GetRandomSpawnPositionMinMaxToPosition(targetPosition, minRange, maxRange, 1, false,
             out Vector3 newPosition,
             player.entityId, _retryCount: 20, _checkLandClaim: true, _maxLandClaimType: EnumLandClaimOwner.Ally,
@@ -263,7 +263,7 @@ namespace AuthZ {
           PersistentPlayerList players = GameManager.Instance.GetPersistentPlayerList();
           Vector3i pos = change.pos;
           PersistentPlayerData player = players.GetPlayerDataFromEntityID(change.changedByEntityId);
-          bool authorized = world.CanPlaceLandProtectionBlockAt(pos, player);
+          var authorized = world.CanPlaceLandProtectionBlockAt(pos, player);
           Log.Out(
             $"[AuthZ] AuthorizeBlockChanges {player.PlayerName.DisplayName} attempted to place a LCB; authorized: {authorized}");
           if (!authorized) {

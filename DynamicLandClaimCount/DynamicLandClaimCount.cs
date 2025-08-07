@@ -11,13 +11,13 @@ namespace DynamicLandClaimCount {
     public static EnumOps Op = EnumOps.Add;
 
     public static int GetLandClaimCount(EntityPlayer player) {
-      int count = GameStats.GetInt(EnumGameStats.LandClaimCount);
+      var count = GameStats.GetInt(EnumGameStats.LandClaimCount);
       if (player is null || CVar is null || CVar.Length == 0 || player.Buffs is null ||
           !player.Buffs.HasCustomVar(CVar) || player.GetCVar(CVar) < 0) {
         return count;
       }
 
-      int cvar = (int)player.GetCVar(CVar);
+      var cvar = (int)player.GetCVar(CVar);
       return Op switch {
         EnumOps.Add => count + cvar,
         EnumOps.Override => cvar,
@@ -45,8 +45,8 @@ namespace DynamicLandClaimCount {
         return;
       }
 
-      Localization.TryGet("dynamic_land_claim_count_message", out string template);
-      string message = template
+      Localization.TryGet("dynamic_land_claim_count_message", out var template);
+      var message = template
         .Replace("{used}", player.GetLandProtectionBlocks().Count.ToString())
         .Replace("{total}", GetLandClaimCount(player).ToString());
 
@@ -62,7 +62,7 @@ namespace DynamicLandClaimCount {
         return;
       }
 
-      string cvar = "";
+      var cvar = "";
       EnumOps op = EnumOps.Add;
       properties.ParseString("dynamic_land_claim_count_cvar", ref cvar);
       properties.ParseEnum("dynamic_land_claim_count_op", ref op);

@@ -22,7 +22,7 @@ namespace CPMFixes {
         return false;
       }
 
-      string command = message.Substring(CpmSettings.Instance.CPMPrefix.Length);
+      var command = message.Substring(CpmSettings.Instance.CPMPrefix.Length);
       return CpmChatCommands.Contains(command);
     }
   }
@@ -33,7 +33,8 @@ namespace CPMFixes {
         Log.Out("[CPMFixes] CPM not loaded, aborting patching process.");
         return;
       }
-      Harmony harmony = new Harmony(_modInstance.Name);
+
+      var harmony = new Harmony(_modInstance.Name);
       harmony.PatchAll(Assembly.GetExecutingAssembly());
     }
   }

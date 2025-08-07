@@ -13,7 +13,7 @@ namespace AuthZ.Patches {
           CodeMatch.StoresLocal("claimSize")
         )
         .ThrowIfInvalid("[AuthZ] Could not find claimSize declaration");
-      int claimSize = codeMatcher.Instruction.operand as int? ?? 0;
+      var claimSize = codeMatcher.Instruction.operand as int? ?? 0;
 
       codeMatcher.MatchStartForward(
           // int num3 = deadZone / 2;

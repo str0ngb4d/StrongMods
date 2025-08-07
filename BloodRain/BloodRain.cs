@@ -47,7 +47,7 @@ namespace BloodRain {
       }
 
       if (_schedule is not null && now >= _schedule.NextStartTime) {
-        int currentDay = GameUtils.WorldTimeToDays(GameManager.Instance.World.worldTime);
+        var currentDay = GameUtils.WorldTimeToDays(GameManager.Instance.World.worldTime);
         if (currentDay >= _minGameDay) {
           StartBloodRain(_schedule.DurationIrlMinutes);
         }
@@ -104,7 +104,7 @@ namespace BloodRain {
         return;
       }
 
-      float remaining = GetRemainingBloodRainSeconds();
+      var remaining = GetRemainingBloodRainSeconds();
       foreach (EntityPlayer p in playerList) {
         if (IsBloodRainTime()) {
           p.SetCVar(BloodRainRemainingSecondsCVar, remaining);
@@ -141,8 +141,8 @@ namespace BloodRain {
         return;
       }
 
-      string schedule = "";
-      float duration = DefaultDurationIrlMinutes;
+      var schedule = "";
+      var duration = DefaultDurationIrlMinutes;
       properties.ParseString("blood_rain_schedule_irl", ref schedule);
       properties.ParseFloat("blood_rain_duration_irl_minutes", ref duration);
       properties.ParseInt("blood_rain_min_game_day", ref _minGameDay);
@@ -190,14 +190,14 @@ namespace BloodRain {
     }
 
     public static TimeSpan? GetNextWarningTimeSpan(DateTime nextStartTime, TimeSpan? lastWarning = null) {
-      double remaining = (nextStartTime - DateTime.Now).TotalMinutes;
+      var remaining = (nextStartTime - DateTime.Now).TotalMinutes;
       if (remaining < 1) {
         // Don't warn at 0 minutes
         return null;
       }
 
-      double max = lastWarning is null ? DefaultWarningIrlMinutes : ((TimeSpan)lastWarning).TotalMinutes - 1;
-      double next = Math.Floor(Math.Min(max, remaining));
+      var max = lastWarning is null ? DefaultWarningIrlMinutes : ((TimeSpan)lastWarning).TotalMinutes - 1;
+      var next = Math.Floor(Math.Min(max, remaining));
       Log.Out($"[BloodRain] Next warning is scheduled for {next} minutes before the blood rain");
       return TimeSpan.FromMinutes(next);
     }

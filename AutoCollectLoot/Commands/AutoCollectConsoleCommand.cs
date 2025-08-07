@@ -29,7 +29,7 @@ Usage:
           return;
         }
 
-        string command = @params[0];
+        var command = @params[0];
         switch (command) {
           case "enable":
             AutoCollectLoot.Enabled = true;

@@ -17,7 +17,7 @@ namespace AutoCollectLoot {
 
       Log.Out($"[AutoCollectLoot] Collecting loot for {entity.EntityName}");
 
-      string lootDropItemName = GetLootItemName(entity);
+      var lootDropItemName = GetLootItemName(entity);
       if (lootDropItemName is null || lootDropItemName.Length == 0) {
         return false;
       }
@@ -39,10 +39,10 @@ namespace AutoCollectLoot {
         return true;
       }
 
-      ulong worldTime = GameManager.Instance.World.worldTime;
-      int duskHour = GameManager.Instance.World.DuskHour;
-      int dawnHour = GameManager.Instance.World.DawnHour;
-      int bloodmoonDay = SkyManager.bloodmoonDay;
+      var worldTime = GameManager.Instance.World.worldTime;
+      var duskHour = GameManager.Instance.World.DuskHour;
+      var dawnHour = GameManager.Instance.World.DawnHour;
+      var bloodmoonDay = SkyManager.bloodmoonDay;
       return GameUtils.IsBloodMoonTime(worldTime, (duskHour, dawnHour), bloodmoonDay);
     }
 
@@ -54,7 +54,7 @@ namespace AutoCollectLoot {
         return null;
       }
 
-      string lootItemName = dropped.Properties.GetString(LootItemNameProperty);
+      var lootItemName = dropped.Properties.GetString(LootItemNameProperty);
       Log.Out($"[AutoCollectLoot] Found loot item {lootItemName} for {entity.EntityName}");
       return lootItemName;
     }
@@ -71,7 +71,7 @@ namespace AutoCollectLoot {
       }
 
       World world = GameManager.Instance.World;
-      EntityItem loot = (EntityItem)EntityFactory.CreateEntity(new EntityCreationData {
+      var loot = (EntityItem)EntityFactory.CreateEntity(new EntityCreationData {
         entityClass = EntityClass.FromString("item"),
         id = EntityFactory.nextEntityID++,
         itemStack = new ItemStack(itemValue, 1),
@@ -105,12 +105,12 @@ namespace AutoCollectLoot {
       }
 
       // killer has a 50% chance to win off the bat
-      EntityPlayer killer = _killed.entityThatKilledMe as EntityPlayer;
+      var killer = _killed.entityThatKilledMe as EntityPlayer;
       if (killer is not null && _random.RandomRange(2) == 0) {
         return killer;
       }
 
-      int range = GameStats.GetInt(EnumGameStats.PartySharedKillRange);
+      var range = GameStats.GetInt(EnumGameStats.PartySharedKillRange);
       List<Entity> candidates = new();
       if (killer is not null) {
         candidates.Add(killer);

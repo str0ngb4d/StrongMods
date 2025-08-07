@@ -14,7 +14,7 @@ namespace AutoCollectLoot.Patches {
         )
         .ThrowIfInvalid("[AutoCollectLoot] Could not find loot roll")
         .Advance(2);
-      object retLabel = codeMatcher.Instruction.operand;
+      var retLabel = codeMatcher.Instruction.operand;
       codeMatcher.Advance(1).Insert(
         CodeInstruction.LoadArgument(0), // this
         CodeInstruction.Call(() => AutoCollectLoot.TryCollect(null)),

@@ -60,7 +60,7 @@ namespace AutoCollectLoot {
     }
 
     public static EntityPlayer ChooseRecipient(EntityAlive entity) {
-      LootLottery lottery = new(entity);
+      var lottery = new LootLottery(entity);
       return lottery.ChooseWinner();
     }
 

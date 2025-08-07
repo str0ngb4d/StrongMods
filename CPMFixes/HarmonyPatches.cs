@@ -22,12 +22,17 @@ namespace CPMFixes {
         return false;
       }
 
-      return CpmChatCommands.Contains(message);
+      string command = message.Substring(CpmSettings.Instance.CPMPrefix.Length);
+      return CpmChatCommands.Contains(command);
     }
   }
 
   public class Initializer : IModApi {
     public void InitMod(Mod _modInstance) {
+      if (!ModManager.ModLoaded("1CSMM_Patrons")) {
+        Log.Out("[CPMFixes] CPM not loaded, aborting patching process.");
+        return;
+      }
       Harmony harmony = new Harmony(_modInstance.Name);
       harmony.PatchAll(Assembly.GetExecutingAssembly());
     }

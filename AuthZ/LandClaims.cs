@@ -287,6 +287,8 @@ namespace AuthZ {
   public static class EntityAliveExtension {
     private static readonly ConditionalWeakTable<EntityAlive, EntityAliveAdditionalData> Data = new();
 
-    public static EntityAliveAdditionalData GetAdditionalData(this EntityAlive entity) => Data.GetOrCreateValue(entity);
+    public static EntityAliveAdditionalData GetAdditionalData(this EntityAlive entity) {
+      return Data.GetOrCreateValue(entity);
+    }
   }
 }

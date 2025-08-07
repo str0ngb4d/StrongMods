@@ -12,11 +12,17 @@ Usage:
 
 ";
 
-    public override string getDescription() => "Blood rain administration";
+    public override string getDescription() {
+      return "Blood rain administration";
+    }
 
-    public override string getHelp() => Usage;
+    public override string getHelp() {
+      return Usage;
+    }
 
-    public override string[] getCommands() => new[] { "bloodrain", "br" };
+    public override string[] getCommands() {
+      return new[] { "bloodrain", "br" };
+    }
 
     public override void Execute(List<string> @params, CommandSenderInfo senderInfo) {
       try {

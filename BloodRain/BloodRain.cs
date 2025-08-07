@@ -30,7 +30,9 @@ namespace BloodRain {
 
     private static DateTime? _endTime;
 
-    public static bool IsBloodRainTime() => _endTime is not null;
+    public static bool IsBloodRainTime() {
+      return _endTime is not null;
+    }
 
     public static float GetRemainingBloodRainSeconds() {
       if (_endTime is null) {

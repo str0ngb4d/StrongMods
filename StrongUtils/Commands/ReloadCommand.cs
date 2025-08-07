@@ -5,11 +5,17 @@ namespace StrongUtils.Commands {
   public class ReloadCommand : ConsoleCmdAbstract {
     private const string Usage = @"Usage: reload";
 
-    public override string getDescription() => "Reloads configuration.";
+    public override string getDescription() {
+      return "Reloads configuration.";
+    }
 
-    public override string getHelp() => Usage;
+    public override string getHelp() {
+      return Usage;
+    }
 
-    public override string[] getCommands() => new[] { "reload" };
+    public override string[] getCommands() {
+      return new[] { "reload" };
+    }
 
     public override void Execute(List<string> @params, CommandSenderInfo senderInfo) {
       try {

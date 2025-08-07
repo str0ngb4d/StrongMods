@@ -52,17 +52,23 @@ namespace DynamicLandClaimCount {
 
   [HarmonyPatch(typeof(WorldEnvironment), nameof(WorldEnvironment.OnXMLChanged))]
   public class WorldEnvironmentOnXMLChangedPatch {
-    private static void Postfix() => DynamicLandClaimCount.OnXMLChanged();
+    private static void Postfix() {
+      DynamicLandClaimCount.OnXMLChanged();
+    }
   }
 
   [HarmonyPatch(typeof(PersistentPlayerData), nameof(PersistentPlayerData.AddLandProtectionBlock))]
   public class PersistentPlayerDataAddLandProtectionBlockPatch {
-    private static void Postfix(PersistentPlayerData __instance) => DynamicLandClaimCount.WhisperLandClaimCount(__instance);
+    private static void Postfix(PersistentPlayerData __instance) {
+      DynamicLandClaimCount.WhisperLandClaimCount(__instance);
+    }
   }
 
   [HarmonyPatch(typeof(PersistentPlayerData), nameof(PersistentPlayerData.RemoveLandProtectionBlock))]
   public class PersistentPlayerDataRemoveLandProtectionBlockPatch {
-    private static void Postfix(PersistentPlayerData __instance) => DynamicLandClaimCount.WhisperLandClaimCount(__instance);
+    private static void Postfix(PersistentPlayerData __instance) {
+      DynamicLandClaimCount.WhisperLandClaimCount(__instance);
+    }
   }
 
   public class Initializer : IModApi {
